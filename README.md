@@ -26,7 +26,7 @@ The test class `TriggerSlackWebhookTest` ensures the functionality of `TriggerSl
 To integrate Salesforce with Slack:
 1. **Configure Webhooks in Slack**: Set up incoming webhooks in your Slack workspace to generate endpoints that Salesforce can post messages to.
 2. **Set Up the Apex Class**: Deploy `TriggerSlackWebhook` in your Salesforce org.
-3. **Invoke from a Salesforce Process**: Use Salesforce Process Builder or Flow to invoke `sendToSlack` based on specific triggers within Salesforce.
+3. **Invoke from a Salesforce Process**: Use Flow Builder or another automated method to invoke `sendToSlack` based on specific triggers within Salesforce.
 
 ## Usage
 To send a message to Slack, create an instance of `Request`, populate it with necessary details such as the webhook URL, message, and record ID, and pass it to `sendToSlack`.
