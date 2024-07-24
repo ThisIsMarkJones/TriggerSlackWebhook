@@ -1,0 +1,61 @@
+public class TriggerSlackWebhook {
+    @InvocableMethod(label='Send to Slack' description='Send a message to Slack')
+    public static void sendToSlack(List<Request> requests) {
+        for (Request req : requests) {
+            System.debug('Sending message to Slack: Endpoint=' + req.endpoint + 
+                         ', Message=' + req.message + 
+                         ', RecordID=' + req.recordId + 
+                         ', SlackChannelName=' + req.slackChannelName);
+            sendMessage(req.endpoint, req.message, req.recordId, req.slackChannelName);
+        }
+    }
+
+    @future(callout=true)
+    private static void sendMessage(String endpoint, String message, String recordId, String slackChannelName) {
+        try {
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint(endpoint);
+            req.setMethod('POST');
+            req.setHeader('Content-Type', 'application/json');
+            
+            // Adjusting payload to meet the Slack expected format
+            Map<String, Object> payloadMap = new Map<String, Object>();
+            payloadMap.put('recordId', recordId);  // Using recordId as a top-level key
+            payloadMap.put('slackChannelName', slackChannelName);  // Correct field name for Slack
+
+            // Optionally include message if needed by your Slack workflow:
+            // payloadMap.put('message', message);
+
+            String payload = JSON.serialize(payloadMap);
+            System.debug('JSON Payload: ' + payload);
+
+            req.setBody(payload);
+
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+
+            // Log the response from Slack
+            if (res.getStatusCode() != 200) {
+                System.debug('Error sending to Slack: ' + res.getStatus() + '; ' + res.getBody());
+            } else {
+                System.debug('Message sent successfully to Slack: ' + res.getBody());
+            }
+        } catch (Exception e) {
+            System.debug('Error sending message to Slack: ' + e.getMessage());
+        }
+    }
+
+    public class Request {
+        @InvocableVariable(required=true description='The Slack webhook URL')
+        public String endpoint;
+        
+        @InvocableVariable(required=true description='The message to send to Slack')
+        public String message;
+        
+        @InvocableVariable(required=true description='The record ID')
+        public String recordId;
+
+        @InvocableVariable(required=false description='The Slack channel name')
+        public String slackChannelName;
+    }
+}
