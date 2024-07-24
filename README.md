@@ -1,4 +1,4 @@
-# Salesforce Slack Integration
+# Trigger Slack Webhook
 
 ## Overview
 This repository contains Salesforce Apex code designed to facilitate the sending of messages from Salesforce to Slack using Slack Webhooks. The integration is encapsulated into two main components: an Apex Class (`TriggerSlackWebhook`) and its corresponding test class (`TriggerSlackWebhookTest`).
