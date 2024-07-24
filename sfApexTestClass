@@ -1,0 +1,45 @@
+@isTest
+public class TriggerSlackListWebhookTest {
+
+    @isTest
+    static void testSendToSlack() {
+        // Setup test data
+        TriggerSlackListWebhook.Request testRequest = new TriggerSlackListWebhook.Request();
+        testRequest.endpoint = 'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX';
+        testRequest.message = 'Hello, this is a test message!';
+        testRequest.recordId = 'a1B2c3D4e5F6';
+
+        // Create a list of requests
+        List<TriggerSlackListWebhook.Request> requests = new List<TriggerSlackListWebhook.Request>{ testRequest };
+
+        // Set mock callout class
+        Test.setMock(HttpCalloutMock.class, new SlackCalloutMock());
+
+        // Test the method
+        Test.startTest();
+        TriggerSlackListWebhook.sendToSlack(requests);
+        Test.stopTest();
+
+        // Additional assertions can be added here if needed
+        // Example: assert on debug logs if the log handling is important
+    }
+
+    // Mock class implementing HttpCalloutMock
+    private class SlackCalloutMock implements HttpCalloutMock {
+        public HttpResponse respond(HttpRequest request) {
+            // Verify request method and endpoint
+            System.assertEquals('POST', request.getMethod());
+            System.assertEquals('https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX', request.getEndpoint());
+
+            // Verify the request body
+            String expectedBody = '{"text": "Hello, this is a test message!", "blocks": [{"type": "section", "fields": [{"type": "mrkdwn", "text": "Record ID: a1B2c3D4e5F6"}, {"type": "mrkdwn", "text": "Message: Hello, this is a test message!"}]}]}';
+            System.assertEquals(expectedBody, request.getBody());
+
+            // Create a fake response
+            HttpResponse response = new HttpResponse();
+            response.setStatusCode(200);
+            response.setBody('{"success": true}');
+            return response;
+        }
+    }
+}
